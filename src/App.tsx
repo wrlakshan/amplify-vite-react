@@ -1,4 +1,7 @@
+import { Button, Card, Divider, Flex, Heading, Text } from "@aws-amplify/ui-react";
+import { StorageImage, StorageManager } from "@aws-amplify/ui-react-storage";
 import { generateClient } from "aws-amplify/data";
+import { getUrl } from "aws-amplify/storage";
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 
@@ -13,34 +16,76 @@ function App() {
     });
   }, []);
 
-  function createTodo() {
+  function createTodo({ key, content }: { key: string; content: string }) {
     client.models.Todo.create({
-      content: window.prompt("Todo content") ?? "",
-      location: {
-        lat: 12.13,
-        long: 987.08,
-      },
-      priority: "high",
+      content,
+      key,
     });
   }
 
+  function deleteTodos(id: string) {
+    client.models.Todo.delete({ id });
+  }
+
+  async function grabURL(path: string) {
+    console.log("path", path);
+    const { url } = await getUrl({ path });
+    console.log("url", url);
+    return url.toString();
+  }
+
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
-      </div>
-    </main>
+    <>
+      <Heading width="30vw" level={1}>
+        My Todos
+      </Heading>
+
+      {todos.map((todo) => (
+        <li key={todo.id} onClick={() => deleteTodos(todo.id)}>
+          <Flex justifyContent="space-between">
+            <Text>{todo.content}</Text>
+            {todo.key ? <StorageImage alt={todo.content || ""} path={todo.key} width="100px" /> : null}
+          </Flex>
+        </li>
+      ))}
+
+      <StorageManager
+        path="media/"
+        acceptedFileTypes={["image/*"]}
+        maxFileCount={1}
+        onUploadStart={({ key }) => {
+          const content = window.prompt("Todo Content");
+          if (!key || !content) return;
+          createTodo({ key, content });
+        }}
+        components={{
+          Container({ children }) {
+            return <Card variation="elevated"> {children}</Card>;
+          },
+          DropZone({ children, displayText, inDropZone, ...rest }) {
+            return (
+              <Flex
+                alignItems="center"
+                direction="column"
+                padding="medium"
+                backgroundColor={inDropZone ? "primary.10" : ""}
+                {...rest}>
+                <Text> Drop file here</Text>
+                <Divider size="small" label="or" maxWidth="10rem" />
+                {children}
+              </Flex>
+            );
+          },
+          FilePicker({ onClick }) {
+            return (
+              <Button onClick={onClick} variation="primary">
+                Select File
+              </Button>
+            );
+          },
+        }}
+      />
+    </>
   );
 }
 

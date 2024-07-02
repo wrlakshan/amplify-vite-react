@@ -10,11 +10,7 @@ const schema = a.schema({
   Todo: a
     .model({
       content: a.string().required(),
-      location: a.customType({
-        lat: a.float(),
-        long: a.float(),
-      }),
-      priority: a.enum(["low", "medium", "high"]),
+      key: a.string(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
