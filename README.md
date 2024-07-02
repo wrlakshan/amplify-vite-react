@@ -1,3 +1,9 @@
+## To Run this Project
+
+1. Run `npx ampx sandbox` in your terminal.
+2. Run `npm run dev` in your terminal.
+
+
 ## AWS Amplify React+Vite Starter Template
 
 This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
