@@ -1,7 +1,6 @@
 import { Button, Card, Divider, Flex, Heading, Text } from "@aws-amplify/ui-react";
 import { StorageImage, StorageManager } from "@aws-amplify/ui-react-storage";
 import { generateClient } from "aws-amplify/data";
-import { getUrl } from "aws-amplify/storage";
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 
@@ -14,7 +13,16 @@ function App() {
     client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
+
+    client.queries.sayHello({
+      name: "Amplify",
+    });
   }, []);
+
+  // const fetchTodos = async () => {
+  //   const { data: items, errors } = await client.models.Todo.list();
+  //   setTodos(items);
+  // };
 
   function createTodo({ key, content }: { key: string; content: string }) {
     client.models.Todo.create({
@@ -27,27 +35,18 @@ function App() {
     client.models.Todo.delete({ id });
   }
 
-  async function grabURL(path: string) {
-    console.log("path", path);
-    const { url } = await getUrl({ path });
-    console.log("url", url);
-    return url.toString();
-  }
+  // async function grabURL(path: string) {
+  //   console.log("path", path);
+  //   const { url } = await getUrl({ path });
+  //   console.log("url", url);
+  //   return url.toString();
+  // }
 
   return (
     <>
       <Heading width="30vw" level={1}>
         My Todos
       </Heading>
-
-      {todos.map((todo) => (
-        <li key={todo.id} onClick={() => deleteTodos(todo.id)}>
-          <Flex justifyContent="space-between">
-            <Text>{todo.content}</Text>
-            {todo.key ? <StorageImage alt={todo.content || ""} path={todo.key} width="100px" /> : null}
-          </Flex>
-        </li>
-      ))}
 
       <StorageManager
         path="media/"
@@ -85,6 +84,15 @@ function App() {
           },
         }}
       />
+
+      {todos.map((todo) => (
+        <li key={todo.id} onClick={() => deleteTodos(todo.id)}>
+          <Flex justifyContent="space-between">
+            <Text>{todo.content}</Text>
+            {todo.key ? <StorageImage alt={todo.content || ""} path={todo.key} width="100px" /> : null}
+          </Flex>
+        </li>
+      ))}
     </>
   );
 }
