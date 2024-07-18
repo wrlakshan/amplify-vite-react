@@ -2,7 +2,9 @@
 
 1. Run `npx ampx sandbox` in your terminal.
 2. Run `npm run dev` in your terminal.
-
+3. npx ampx sandbox secret set SQL_CONNECTION_STRING
+   postgresql://neondb_owner:9U7wPAtVyBTS@ep-tiny-unit-a50en3q1.us-east-2.aws.neon.tech/neondb?sslmode=require
+4. npx ampx generate schema-from-database --connection-uri-secret SQL_CONNECTION_STRING --out amplify/data/schema.sql.ts
 
 ## AWS Amplify React+Vite Starter Template
 

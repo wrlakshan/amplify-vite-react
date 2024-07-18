@@ -17,12 +17,18 @@ function App() {
     client.queries.sayHello({
       name: "Amplify",
     });
-  }, []);
 
-  // const fetchTodos = async () => {
-  //   const { data: items, errors } = await client.models.Todo.list();
-  //   setTodos(items);
-  // };
+    const fetchData = async () => {
+      try {
+        const { data: events } = await client.models.Events.list();
+        console.log("🚀 ~ fetchData ~ events:", events);
+      } catch (error) {
+        console.error("Error fetching events", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   function createTodo({ key, content }: { key: string; content: string }) {
     client.models.Todo.create({

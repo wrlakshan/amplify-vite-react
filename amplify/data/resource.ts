@@ -1,5 +1,8 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { sayHello } from "../functions/say-hello/resource";
+import { schema as generatedSqlSchema } from "./schema.sql";
+
+const sqlSchema = generatedSqlSchema.authorization((allow) => allow.guest()).renameModels(() => [["events", "Events"]]);
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -32,7 +35,8 @@ const schema = a
   })
   .authorization((allow) => [allow.publicApiKey()]);
 
-export type Schema = ClientSchema<typeof schema>;
+const combinedSchema = a.combine([schema, sqlSchema]);
+export type Schema = ClientSchema<typeof combinedSchema>;
 
 export const data = defineData({
   schema,
