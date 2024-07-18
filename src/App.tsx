@@ -20,8 +20,10 @@ function App() {
 
     const fetchData = async () => {
       try {
-        const { data: events } = await client.models.Events.list();
-        console.log("🚀 ~ fetchData ~ events:", events);
+        // const { data: events } = await client.models.Events.list();
+        // console.log("🚀 ~ fetchData ~ events:", events);
+        let data = await client.models.Events.list();
+        console.log("🚀 ~ fetchData ~ data:", data);
       } catch (error) {
         console.error("Error fetching events", error);
       }
