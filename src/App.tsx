@@ -1,5 +1,6 @@
-import { Button, Card, Divider, Flex, Heading, Text } from "@aws-amplify/ui-react";
+import { Authenticator, Button, Card, Divider, Flex, Text } from "@aws-amplify/ui-react";
 import { StorageImage, StorageManager } from "@aws-amplify/ui-react-storage";
+import "@aws-amplify/ui-react/styles.css";
 import { generateClient } from "aws-amplify/data";
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
@@ -51,57 +52,60 @@ function App() {
   // }
 
   return (
-    <>
-      <Heading width="30vw" level={1}>
-        My Todos
-      </Heading>
+    <Authenticator>
+      {({ signOut, user }) => (
+        <main>
+          <h1>{user?.signInDetails?.loginId}'s todos</h1>
 
-      <StorageManager
-        path="media/"
-        acceptedFileTypes={["image/*"]}
-        maxFileCount={1}
-        onUploadStart={({ key }) => {
-          const content = window.prompt("Todo Content");
-          if (!key || !content) return;
-          createTodo({ key, content });
-        }}
-        components={{
-          Container({ children }) {
-            return <Card variation="elevated"> {children}</Card>;
-          },
-          DropZone({ children, displayText, inDropZone, ...rest }) {
-            return (
-              <Flex
-                alignItems="center"
-                direction="column"
-                padding="medium"
-                backgroundColor={inDropZone ? "primary.10" : ""}
-                {...rest}>
-                <Text> Drop file here</Text>
-                <Divider size="small" label="or" maxWidth="10rem" />
-                {children}
+          <StorageManager
+            path="media/"
+            acceptedFileTypes={["image/*"]}
+            maxFileCount={1}
+            onUploadStart={({ key }) => {
+              const content = window.prompt("Todo Content");
+              if (!key || !content) return;
+              createTodo({ key, content });
+            }}
+            components={{
+              Container({ children }) {
+                return <Card variation="elevated"> {children}</Card>;
+              },
+              DropZone({ children, displayText, inDropZone, ...rest }) {
+                return (
+                  <Flex
+                    alignItems="center"
+                    direction="column"
+                    padding="medium"
+                    backgroundColor={inDropZone ? "primary.10" : ""}
+                    {...rest}>
+                    <Text> Drop file here</Text>
+                    <Divider size="small" label="or" maxWidth="10rem" />
+                    {children}
+                  </Flex>
+                );
+              },
+              FilePicker({ onClick }) {
+                return (
+                  <Button onClick={onClick} variation="primary">
+                    Select File
+                  </Button>
+                );
+              },
+            }}
+          />
+
+          {todos.map((todo) => (
+            <li key={todo.id} onClick={() => deleteTodos(todo.id)}>
+              <Flex justifyContent="space-between">
+                <Text>{todo.content}</Text>
+                {todo.key ? <StorageImage alt={todo.content || ""} path={todo.key} width="100px" /> : null}
               </Flex>
-            );
-          },
-          FilePicker({ onClick }) {
-            return (
-              <Button onClick={onClick} variation="primary">
-                Select File
-              </Button>
-            );
-          },
-        }}
-      />
-
-      {todos.map((todo) => (
-        <li key={todo.id} onClick={() => deleteTodos(todo.id)}>
-          <Flex justifyContent="space-between">
-            <Text>{todo.content}</Text>
-            {todo.key ? <StorageImage alt={todo.content || ""} path={todo.key} width="100px" /> : null}
-          </Flex>
-        </li>
-      ))}
-    </>
+            </li>
+          ))}
+          <button onClick={signOut}>Sign out</button>
+        </main>
+      )}
+    </Authenticator>
   );
 }
 
